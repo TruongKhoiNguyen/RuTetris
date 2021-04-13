@@ -1,0 +1,13 @@
+# depslib dependency file v1.0
+1618318542 source:d:\documents\codes\temp\tetris\main.cpp
+	<iostream>
+	<SDl.h>
+	<SDL_mixer.h>
+	"Game.h"
+
+1618318544 d:\documents\codes\temp\tetris\include\game.h
+	<iostream>
+	<SDL.h>
+	<SDL_ttf.h>
+	<SDL_mixer.h>
+
