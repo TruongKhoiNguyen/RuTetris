@@ -1,10 +1,7 @@
-#include <iostream>
-#include <SDl.h>
-#include <SDL_mixer.h>
-#include "Game.h"
+#include "App.h"
 
 int main(int argc, char* argv[]) {
-    Game game;
-    game.run_game();
+    App app;
+    app.run_game();
     return 0;
 }
