@@ -1,6 +1,7 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
+#include "Game_Constant.h"
 #include "Tetromino.h"
 
 enum class Game_Phase {
@@ -9,11 +10,6 @@ enum class Game_Phase {
     GAME_PHASE_LINE,
     GAME_PHASE_GAMEOVER
 };
-
-const int WIDTH = 10;
-const int HEIGHT = 22;
-const int VISIBLE_HEIGHT = 20;
-const int GRID_SIZE = 30;
 
 struct Piece_State {
     int tetromino_index;
