@@ -12,6 +12,10 @@ Performer::Performer()
     SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 
     if (Mix_OpenAudio(SOUND_FREQUENCY, MIX_DEFAULT_FORMAT, CHANNELS, CHUNKSIZE) != 1) printf("%s", Mix_GetError());
+
+    if (TTF_Init() != 1) printf("%s", TTF_GetError());
+    font = TTF_OpenFont(FONT, 16);
+    if (!font) printf("%s", TTF_GetError());
 }
 
 Performer::~Performer() {
@@ -25,6 +29,48 @@ void Performer::play_background_music() {
     Mix_PlayMusic(music, -1);
 }
 
+void display_text(SDL_Renderer* renderer, TTF_Font* font, const char* text,
+                  int x, int y, const Text_Align alignment, const Color& color) {
+    SDL_Color sdl_color = SDL_Color{ color.r, color.g, color.b, color.a };
+    SDL_Surface* surface = TTF_RenderText_Solid(font, text, sdl_color);
+    SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+
+    SDL_Rect rect;
+    rect.y = y;
+    rect.w = surface->w;
+    rect.h = surface->h;
+
+    switch (alignment)
+    {
+    case Text_Align::TEXT_ALIGN_LEFT:
+        rect.x = x;
+        break;
+    case Text_Align::TEXT_ALIGN_CENTER:
+        rect.x = x - surface->w / 2;
+        break;
+    case Text_Align::TEXT_ALIGN_RIGHT:
+        rect.x = x - surface->w;
+        break;
+    }
+
+    SDL_RenderCopy(renderer, texture, 0, &rect);
+    SDL_FreeSurface(surface);
+    SDL_DestroyTexture(texture);
+}
+
+void display_game_info(SDL_Renderer* renderer, const Game_State& state, TTF_Font* font) {
+    const Color HIGHLIGHT_COLOR = Color(0xFF, 0xFF, 0xFF, 0xFF);
+    char buffer[4096];
+
+    //Display game information
+    snprintf(buffer, sizeof(buffer), "LEVEL: %d", state.level);
+    display_text(renderer, font, buffer, 5, 5, Text_Align::TEXT_ALIGN_LEFT, HIGHLIGHT_COLOR);
+    snprintf(buffer, sizeof(buffer), "LINES: %d", state.line_count);
+    display_text(renderer, font, buffer, 5, 35, Text_Align::TEXT_ALIGN_LEFT, HIGHLIGHT_COLOR);
+    snprintf(buffer, sizeof(buffer), "POINTS: %d", state.points);
+    display_text(renderer, font, buffer, 5, 65, Text_Align::TEXT_ALIGN_LEFT, HIGHLIGHT_COLOR);
+}
+
 void show_start_screen(const Game_State& state) {}
 void show_play_screen(const Game_State& state) {}
 void show_line_screen(const Game_State& state) {}
@@ -33,6 +79,8 @@ void show_gameover_screen(const Game_State& state) {}
 void Performer::show(const Game_State& state) const {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
+
+    display_game_info(renderer, state, font);
 
     switch (state.phase) {
     case Game_Phase::GAME_PHASE_START:

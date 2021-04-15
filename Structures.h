@@ -10,6 +10,16 @@ enum class Game_Phase {
 
 struct Game_State {
     Game_Phase phase;
+
+    int level;
+    int line_count;
+    int points;
+};
+
+enum class Text_Align {
+    TEXT_ALIGN_LEFT,
+    TEXT_ALIGN_CENTER,
+    TEXT_ALIGN_RIGHT
 };
 
 

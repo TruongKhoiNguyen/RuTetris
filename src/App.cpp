@@ -19,6 +19,11 @@ void App::run_game() {
     //Load and play music
     performer.play_background_music();
 
+    //Test
+    state.level = 4;
+    state.line_count = 4;
+    state.points = 34;
+
     bool quit = false;
     while (!quit) {
         SDL_Event e;

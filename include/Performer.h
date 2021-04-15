@@ -7,6 +7,7 @@
 #include <SDL_mixer.h>
 
 #include "../Structures.h"
+#include "../Color.h"
 
 const char TITLE[] = "Tetris";
 const int SCREEN_WIDTH = 300;
@@ -16,6 +17,8 @@ const int SOUND_FREQUENCY = 44100;
 const int CHANNELS = 2;
 const int CHUNKSIZE = 2048;
 const char BGMUSIC[] = "sound/Soviet_anthem.mp3";
+
+const char FONT[] = "font/PressStart2P-vaV7.ttf";
 
 class Performer
 {
@@ -27,7 +30,7 @@ public:
 private:
     SDL_Window* window;
     SDL_Renderer* renderer;
-    Mix_Music* music;
+    TTF_Font* font;
 };
 
 #endif // PERFORMER_H
