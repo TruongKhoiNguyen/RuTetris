@@ -14,7 +14,7 @@ Performer::Performer()
     if (Mix_OpenAudio(SOUND_FREQUENCY, MIX_DEFAULT_FORMAT, CHANNELS, CHUNKSIZE) != 1) printf("%s", Mix_GetError());
 
     if (TTF_Init() != 1) printf("%s", TTF_GetError());
-    font = TTF_OpenFont(FONT, 16);
+    font = TTF_OpenFont(FONT, 22);
     if (!font) printf("%s", TTF_GetError());
 }
 
@@ -71,15 +71,35 @@ void display_game_info(SDL_Renderer* renderer, const Game_State& state, TTF_Font
     display_text(renderer, font, buffer, 5, 65, Text_Align::TEXT_ALIGN_LEFT, HIGHLIGHT_COLOR);
 }
 
+void fill_rect(SDL_Renderer* renderer, int x, int y, int width, int height, const Color& color)
+{
+    SDL_Rect rect = {};
+    rect.x = x;
+    rect.y = y;
+    rect.w = width;
+    rect.h = height;
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    SDL_RenderFillRect(renderer, &rect);
+}
+
+
 void show_start_screen(const Game_State& state) {}
-void show_play_screen(const Game_State& state) {}
+void show_play_screen(SDL_Renderer* renderer, const Game_State& state) {}
 void show_line_screen(const Game_State& state) {}
 void show_gameover_screen(const Game_State& state) {}
+
+void draw_board(SDL_Renderer* renderer, const int board[], int width, int height,
+                int offset_x, int offset_y)
+{
+    fill_rect(renderer, offset_x, offset_y,
+              width * GRID_SIZE, height * GRID_SIZE, BASE_COLORS[0]);
+}
 
 void Performer::show(const Game_State& state) const {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
+    draw_board(renderer, state.board, WIDTH, VISIBLE_HEIGHT, MARGIN_X, MARGIN_Y);
     display_game_info(renderer, state, font);
 
     switch (state.phase) {
@@ -87,7 +107,7 @@ void Performer::show(const Game_State& state) const {
         show_start_screen(state);
         break;
     case Game_Phase::GAME_PHASE_PLAY:
-        show_play_screen(state);
+        show_play_screen(renderer, state);
         break;
     case Game_Phase::GAME_PHASE_LINE:
         show_line_screen(state);

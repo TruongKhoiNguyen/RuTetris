@@ -24,6 +24,10 @@ void App::run_game() {
     state.line_count = 4;
     state.points = 34;
 
+    state.piece.tetromino_index = 1;
+    state.piece.rotation = 1;
+    state.piece.offset_col = 50;
+
     bool quit = false;
     while (!quit) {
         SDL_Event e;

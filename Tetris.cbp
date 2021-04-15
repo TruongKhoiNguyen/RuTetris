@@ -36,6 +36,7 @@
 		<Unit filename="Color.h" />
 		<Unit filename="Main.cpp" />
 		<Unit filename="Structures.h" />
+		<Unit filename="Tetromino.h" />
 		<Unit filename="include/App.h" />
 		<Unit filename="include/Performer.h" />
 		<Unit filename="src/App.cpp" />

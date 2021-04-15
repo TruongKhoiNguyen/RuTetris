@@ -15,9 +15,10 @@
 	"../Structures.h"
 	"Performer.h"
 
-1618484205 d:\documents\codes\temp\tetris\structures.h
+1618500163 d:\documents\codes\temp\tetris\structures.h
+	"Tetromino.h"
 
-1618485694 d:\documents\codes\temp\tetris\include\performer.h
+1618498915 d:\documents\codes\temp\tetris\include\performer.h
 	<iostream>
 	<SDL.h>
 	<SDL_ttf.h>
@@ -25,12 +26,15 @@
 	"../Structures.h"
 	"../Color.h"
 
-1618485374 source:d:\documents\codes\temp\tetris\src\app.cpp
+1618500649 source:d:\documents\codes\temp\tetris\src\app.cpp
 	"App.h"
 
-1618485669 source:d:\documents\codes\temp\tetris\src\performer.cpp
+1618501569 source:d:\documents\codes\temp\tetris\src\performer.cpp
 	"Performer.h"
 
 1618485233 d:\documents\codes\temp\tetris\color.h
+	<cstdint>
+
+1618498158 d:\documents\codes\temp\tetris\tetromino.h
 	<cstdint>
 

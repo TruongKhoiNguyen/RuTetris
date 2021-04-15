@@ -13,12 +13,15 @@ const char TITLE[] = "Tetris";
 const int SCREEN_WIDTH = 300;
 const int SCREEN_HEIGHT = 720;
 
+const int MARGIN_X = 0;
+const int MARGIN_Y = SCREEN_HEIGHT - VISIBLE_HEIGHT * GRID_SIZE;
+
 const int SOUND_FREQUENCY = 44100;
 const int CHANNELS = 2;
 const int CHUNKSIZE = 2048;
 const char BGMUSIC[] = "sound/Soviet_anthem.mp3";
 
-const char FONT[] = "font/PressStart2P-vaV7.ttf";
+const char FONT[] = "font/soviet-bold-expanded.ttf";
 
 class Performer
 {
@@ -31,6 +34,7 @@ private:
     SDL_Window* window;
     SDL_Renderer* renderer;
     TTF_Font* font;
+    //Mix_Music* music;
 };
 
 #endif // PERFORMER_H
