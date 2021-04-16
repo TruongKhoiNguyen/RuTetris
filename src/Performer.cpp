@@ -185,19 +185,19 @@ For each cell in piece, draw cell
 */
 void draw_piece(SDL_Renderer* renderer, const Piece_State& piece, bool outline = false) {
     const int side = TETROMINOES[piece.tetromino_index].side;
-    for (int i = 0; i < side; ++i) {
-        for (int j = 0; j < side; ++j) {
-            int color_index = piece.get_value(i, j);
+    for (int row = 0; row < side; ++row) {
+        for (int col = 0; col < side; ++col) {
+            int color_index = piece.get_value(row, col);
             if (color_index) {
                 if (!outline) {
                     draw_cell(renderer, color_index,
-                          piece.offset_col + i,
-                          piece.offset_row + j,
+                          piece.offset_col + col,
+                          piece.offset_row + row,
                           MARGIN_X, MARGIN_Y);
                 } else {
                     draw_outline(renderer, color_index,
-                                 piece.offset_col + i,
-                                 piece.offset_row + j,
+                                 piece.offset_col + col,
+                                 piece.offset_row + row,
                                  MARGIN_X, MARGIN_Y);
                 }
             }
@@ -215,13 +215,13 @@ For each piece check if it collide with wall or other piece
 */
 inline bool detect_collision(const int board[], const Piece_State& piece) {
     int side = TETROMINOES[piece.tetromino_index].side;
-    for (int i = 0; i < side; ++i) {
-        for (int j = 0; j < side; ++j) {
-            int value = piece.get_value(i, j);
+    for (int row = 0; row < side; ++row) {
+        for (int col = 0; col < side; ++col) {
+            int value = piece.get_value(row, col);
 
             if (value) {
-                int board_row = piece.offset_row + i;
-                int board_col = piece.offset_col + j;
+                int board_row = piece.offset_row + row;
+                int board_col = piece.offset_col + col;
 
                 if (board_row < 0){
                     return true;

@@ -45,7 +45,91 @@ inline void update_game_start(const Input_State& input, Game_State& state) {
     }
     else state.selecting = false;
 }
-inline void update_game_play(const Input_State& input, Game_State& state, std::queue<int>& Piece_queue) {}
+
+bool check_piece_valid(int board[], const Piece_State& piece)
+{
+    int side = TETROMINOES[piece.tetromino_index].side;
+
+    for (int row = 0; row < side; ++row) {
+        for (int col = 0; col < side; ++col){
+            int value = piece.get_value(row, col);
+            if (value > 0)
+            {
+                int board_row = piece.offset_row + row;
+                int board_col = piece.offset_col + col;
+                if (board_row < 0)
+                {
+                    return false;
+                }
+                if (board_row >= HEIGHT)
+                {
+                    return false;
+                }
+                if (board_col < 0)
+                {
+                    return false;
+                }
+                if (board_col >= WIDTH)
+                {
+                    return false;
+                }
+                if (board[row * WIDTH + col])
+                {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
+/*
+Create new piece
+Move
+Check collision
+    Update
+*/
+inline void move_piece(const Input_State& input, Game_State& state){
+    Piece_State piece = state.piece;
+    if (input.dleft > 0)
+    {
+        --piece.offset_col;
+    }
+    if (input.dright > 0)
+    {
+        ++piece.offset_col;
+    }
+    if (input.dup > 0)
+    {
+        piece.rotation = (piece.rotation + 1) % 4;
+    }
+
+    if (check_piece_valid(state.board, piece)) {
+        state.piece = piece;
+    }
+}
+inline void hard_drop(Game_State& state, std::queue<int>& piece_queue){}
+void soft_drop(Game_State& state) {}
+inline void check_line(Game_State& state) {}
+inline void check_game_over(Game_State& state) {}
+
+/*
+Change piece position and rotation
+Check hard drop
+    Hard drop
+Soft drop
+Check line
+Check game over
+*/
+inline void update_game_play(const Input_State& input, Game_State& state, std::queue<int>& piece_queue) {
+    move_piece(input, state);
+    if (input.da > 0) {
+        hard_drop(state, piece_queue);
+    }
+    soft_drop(state);
+    check_line(state);
+    check_game_over(state);
+}
 inline void update_game_line(Game_State& state){};
 inline void update_game_gameover(const Input_State& input, Game_State& state) {}
 

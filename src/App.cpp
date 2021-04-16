@@ -61,18 +61,28 @@ void App::run_game() {
     state.points = 34;
 
     state.piece.tetromino_index = 3;
-    state.piece.rotation = 2;
+    state.piece.rotation = 0;
     state.piece.offset_col = 0;
     state.piece.offset_row = 2;
 
     std::fill(state.lines, state.lines + HEIGHT, false);
     state.lines[20] = true;
 
-    for (int i = 0; i < HEIGHT; ++i) {
-        for (int j = 0; j < WIDTH; ++j) {
-            printf("%d ",state.board[i*WIDTH + j]);
+    int side = TETROMINOES[state.piece.tetromino_index].side;
+    for (int i = 0; i < side; ++i) {
+        for (int j = 0; j < side; ++j) {
+            std::cout << TETROMINOES[state.piece.tetromino_index].shape[i*side + j] << " ";
         }
-        printf("\n");
+        std::cout << std::endl;
+    }
+
+    std::cout << std::endl;
+
+    for (int i = 0; i < side; ++i) {
+        for (int j = 0; j < side; ++j) {
+            std::cout << state.piece.get_value(i, j) << " ";
+        }
+        std::cout << std::endl;
     }
 
     bool quit = false;
