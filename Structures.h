@@ -17,7 +17,7 @@ struct Piece_State {
     int offset_col;
     int rotation;
 
-    u8 get_value(int row, int col) const {
+    int get_value(int row, int col) const {
         int side = TETROMINOES[tetromino_index].side;
         switch (rotation) {
         case 0:
@@ -36,6 +36,8 @@ struct Piece_State {
 struct Game_State {
     Game_Phase phase;
     int board[WIDTH*HEIGHT];
+
+    int start_level;
 
     Piece_State piece;
 

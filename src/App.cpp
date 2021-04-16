@@ -14,19 +14,42 @@ void scan_input() {}
 
 void update_game() {}
 
+/*
+Load music
+Declare test
+Run game loop
+    Get input
+    Update game
+    Render and Play sound
+*/
 void App::run_game() {
     Performer performer;
     //Load and play music
     performer.play_background_music();
 
+    //Create game state
+    Game_State state;
+    std::fill(state.board, state.board + WIDTH*HEIGHT, 0);
+
     //Test
+    state.phase = Game_Phase::GAME_PHASE_PLAY;
+    state.start_level = 10;
+
     state.level = 4;
     state.line_count = 4;
     state.points = 34;
 
-    state.piece.tetromino_index = 1;
-    state.piece.rotation = 1;
-    state.piece.offset_col = 50;
+    state.piece.tetromino_index = 3;
+    state.piece.rotation = 2;
+    state.piece.offset_col = 22 - 3;
+    state.piece.offset_row = 0;
+
+    for (int i = 0; i < HEIGHT; ++i) {
+        for (int j = 0; j < WIDTH; ++j) {
+            printf("%d ",state.board[i*WIDTH + j]);
+        }
+        printf("\n");
+    }
 
     bool quit = false;
     while (!quit) {

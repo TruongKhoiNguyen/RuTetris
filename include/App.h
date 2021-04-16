@@ -18,7 +18,6 @@ public:
     ~App();
     void run_game();
 private:
-    Game_State state;
 };
 
 #endif // APP_H
