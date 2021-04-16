@@ -19,6 +19,8 @@ Performer::Performer()
 }
 
 Performer::~Performer() {
+    TTF_CloseFont(font);
+    TTF_Quit();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
 }
@@ -150,9 +152,7 @@ inline void show_start_screen(SDL_Renderer* renderer, const Game_State& state, T
     display_text(renderer, font, buffer, x, y + 30, Text_Align::TEXT_ALIGN_CENTER, highlight_color);
 
     if (state.selecting) {
-        if (!player.is_freeze_time(250)){
-            player.play_sound_effect(Sound_Effect::SELECTION, 0);
-        }
+        player.play_sound_effect(Sound_Effect::SELECTION, 0);
     }
 }
 
