@@ -135,8 +135,10 @@ void draw_board(SDL_Renderer* renderer, const int board[], int width, int height
 Display start text on screen
     Calculate text position
     Render text
+    Play sound if selecting
 */
-inline void show_start_screen(SDL_Renderer* renderer, const Game_State& state, TTF_Font* font, const Color& highlight_color) {
+inline void show_start_screen(SDL_Renderer* renderer, const Game_State& state, TTF_Font* font, const Color& highlight_color,
+                              Sound_Player& player) {
     char buffer[4096];
 
     int x = WIDTH * GRID_SIZE / 2;
@@ -146,6 +148,12 @@ inline void show_start_screen(SDL_Renderer* renderer, const Game_State& state, T
 
     snprintf(buffer, sizeof(buffer), "STARTING LEVEL: %d", state.start_level);
     display_text(renderer, font, buffer, x, y + 30, Text_Align::TEXT_ALIGN_CENTER, highlight_color);
+
+    if (state.selecting) {
+        if (!player.is_freeze_time(250)){
+            player.play_sound_effect(Sound_Effect::SELECTION, 0);
+        }
+    }
 }
 
 void draw_rect(SDL_Renderer* renderer, int x, int y, int width, int height, const Color& color){
@@ -317,7 +325,7 @@ void Performer::show(const Game_State& state) {
 
     switch (state.phase) {
     case Game_Phase::GAME_PHASE_START:
-        show_start_screen(renderer, state, font, HIGHLIGHT_COLOR);
+        show_start_screen(renderer, state, font, HIGHLIGHT_COLOR, player);
         break;
     case Game_Phase::GAME_PHASE_PLAY:
         show_play_screen(renderer, state, player);
@@ -327,6 +335,8 @@ void Performer::show(const Game_State& state) {
         break;
     case Game_Phase::GAME_PHASE_GAMEOVER:
         show_gameover_screen(state);
+        break;
+    default:
         break;
     }
 

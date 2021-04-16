@@ -10,6 +10,8 @@ const int HEIGHT = 22;
 const int VISIBLE_HEIGHT = 20;
 const int GRID_SIZE = 30;
 
+const int QUEUE_SIZE = 3;
+
 const int MARGIN_X = 0;
 const int MARGIN_Y = SCREEN_HEIGHT - HEIGHT * GRID_SIZE;
 

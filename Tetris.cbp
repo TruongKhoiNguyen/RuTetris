@@ -35,13 +35,16 @@
 		</Compiler>
 		<Unit filename="Color.h" />
 		<Unit filename="Game_Constant.h" />
+		<Unit filename="Logic_Constant.h" />
 		<Unit filename="Main.cpp" />
 		<Unit filename="Structures.h" />
 		<Unit filename="Tetromino.h" />
 		<Unit filename="include/App.h" />
+		<Unit filename="include/Logic.h" />
 		<Unit filename="include/Performer.h" />
 		<Unit filename="include/Sound_Player.h" />
 		<Unit filename="src/App.cpp" />
+		<Unit filename="src/Logic.cpp" />
 		<Unit filename="src/Performer.cpp" />
 		<Unit filename="src/Sound_Player.cpp" />
 		<Extensions>

@@ -1,8 +1,34 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
+#include <cstdint>
+
 #include "Game_Constant.h"
 #include "Tetromino.h"
+
+typedef uint8_t u8;
+
+struct Input_State {
+    bool quit;
+
+    u8 left;
+    u8 right;
+    u8 up;
+    u8 down;
+    u8 a;
+
+    int dleft;
+    int dright;
+    int dup;
+    int ddown;
+    int da;
+
+    Input_State():
+        quit(false),
+        left(0), right(0), up(0), down(0), a(0),
+        dleft(0), dright(0), dup(0),
+        ddown(0), da(0) {}
+};
 
 enum class Game_Phase {
     GAME_PHASE_START,
@@ -46,6 +72,8 @@ struct Game_State {
     int level;
     int line_count;
     int points;
+
+    bool selecting;
 };
 
 enum class Text_Align {
