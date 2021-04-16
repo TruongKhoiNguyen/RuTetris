@@ -11,7 +11,7 @@ const int VISIBLE_HEIGHT = 20;
 const int GRID_SIZE = 30;
 
 const int MARGIN_X = 0;
-const int MARGIN_Y = SCREEN_HEIGHT - VISIBLE_HEIGHT * GRID_SIZE;
+const int MARGIN_Y = SCREEN_HEIGHT - HEIGHT * GRID_SIZE;
 
 const int SOUND_FREQUENCY = 44100;
 const int CHANNELS = 2;

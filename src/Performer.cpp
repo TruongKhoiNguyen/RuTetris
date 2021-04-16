@@ -114,6 +114,7 @@ Out: Draw board on screen
 
 Draw board background
 Draw piece on board
+Omit 2 first row
 */
 void draw_board(SDL_Renderer* renderer, const int board[], int width, int height,
                 int offset_x, int offset_y)
@@ -126,6 +127,10 @@ void draw_board(SDL_Renderer* renderer, const int board[], int width, int height
             draw_cell(renderer, board[i*width + j], i, j, offset_x, offset_y);
         }
     }
+
+    fill_rect(renderer, 0, MARGIN_Y,
+              WIDTH * GRID_SIZE, (HEIGHT - VISIBLE_HEIGHT) * GRID_SIZE,
+              Color(0x00, 0x00, 0x00, 0x00));
 }
 
 /*
@@ -133,7 +138,7 @@ Display start text on screen
     Calculate text position
     Render text
 */
-void show_start_screen(SDL_Renderer* renderer, const Game_State& state, TTF_Font* font, const Color& highlight_color) {
+inline void show_start_screen(SDL_Renderer* renderer, const Game_State& state, TTF_Font* font, const Color& highlight_color) {
     char buffer[4096];
 
     int x = WIDTH * GRID_SIZE / 2;
@@ -145,43 +150,135 @@ void show_start_screen(SDL_Renderer* renderer, const Game_State& state, TTF_Font
     display_text(renderer, font, buffer, x, y + 30, Text_Align::TEXT_ALIGN_CENTER, highlight_color);
 }
 
+void draw_rect(SDL_Renderer* renderer, int x, int y, int width, int height, const Color& color){
+    SDL_Rect rect = {};
+    rect.x = x;
+    rect.y = y;
+    rect.w = width;
+    rect.h = height;
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    SDL_RenderDrawRect(renderer, &rect);
+}
+
+/*
+Calculate position
+Draw rect
+*/
+void draw_outline(SDL_Renderer* renderer, int value, int pos_x, int pos_y, int offset_x, int offset_y) {
+    Color base_color = BASE_COLORS[value];
+    int x = pos_x * GRID_SIZE + offset_x;
+    int y = pos_y * GRID_SIZE + offset_y;
+    draw_rect(renderer, x, y, GRID_SIZE, GRID_SIZE, base_color);
+}
+
 /*
 Get side of piece
 For each cell in piece, draw cell
     Get the color of the cell
     Draw cell
 */
-void draw_piece(SDL_Renderer* renderer, const Game_State& state) {
-    const int side = TETROMINOES[state.piece.tetromino_index].side;
+void draw_piece(SDL_Renderer* renderer, const Piece_State& piece, bool outline = false) {
+    const int side = TETROMINOES[piece.tetromino_index].side;
     for (int i = 0; i < side; ++i) {
         for (int j = 0; j < side; ++j) {
-            int color_index = state.piece.get_value(i, j);
+            int color_index = piece.get_value(i, j);
             if (color_index) {
-                draw_cell(renderer, color_index,
-                          state.piece.offset_row + i,
-                          state.piece.offset_col + j,
+                if (!outline) {
+                    draw_cell(renderer, color_index,
+                          piece.offset_col + i,
+                          piece.offset_row + j,
                           MARGIN_X, MARGIN_Y);
+                } else {
+                    draw_outline(renderer, color_index,
+                                 piece.offset_col + i,
+                                 piece.offset_row + j,
+                                 MARGIN_X, MARGIN_Y);
+                }
             }
         }
     }
 }
 
 /*
-
+For each piece check if it collide with wall or other piece
+    Get each piece
+    Check position
+        Check out of bounce
+        Collision with other piece
+    Return
 */
-void draw_silhouette(SDL_Renderer* renderer, const Game_State& state) {
+inline bool detect_collision(const int board[], const Piece_State& piece) {
+    int side = TETROMINOES[piece.tetromino_index].side;
+    for (int i = 0; i < side; ++i) {
+        for (int j = 0; j < side; ++j) {
+            int value = piece.get_value(i, j);
 
+            if (value) {
+                int board_row = piece.offset_row + i;
+                int board_col = piece.offset_col + j;
+
+                if (board_row < 0){
+                    return true;
+                }
+                if (board_row >= HEIGHT){
+                    return true;
+                }
+                if (board_col < 0){
+                    return true;
+                }
+                if (board_col >= WIDTH){
+                    return true;
+                }
+                if (board[board_row * WIDTH + board_col]){
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
+
+/*
+Push down piece
+    Push down
+    Detect collision
+    Reposition
+Draw piece
+*/
+inline void draw_silhouette(SDL_Renderer* renderer, const Game_State& state) {
+    Piece_State piece = state.piece;
+
+    while (!detect_collision(state.board, piece)){
+        ++piece.offset_row;
+    }
+    --piece.offset_row;
+
+    draw_piece(renderer, piece, true);
 }
 
 /*
 Draw piece
 Draw piece silhouette
 */
-void show_play_screen(SDL_Renderer* renderer, const Game_State& state) {
-    draw_piece(renderer, state);
+inline void show_play_screen(SDL_Renderer* renderer, const Game_State& state) {
+    draw_piece(renderer, state.piece);
     draw_silhouette(renderer, state);
 }
-void show_line_screen(const Game_State& state) {}
+
+/*
+Check filled row
+Flash filled area
+Play sound
+*/
+void show_line_screen(SDL_Renderer* renderer, const Game_State& state, const Color& highlight_color) {
+    for (int i = HEIGHT-1; i >= 0; --i) {
+        if (state.lines[i]){
+            int x = 0;
+            int y = i * GRID_SIZE + MARGIN_Y;
+            fill_rect(renderer, x, y, WIDTH * GRID_SIZE, GRID_SIZE, highlight_color);
+        }
+    }
+}
 void show_gameover_screen(const Game_State& state) {}
 
 /*
@@ -199,7 +296,7 @@ void Performer::show(const Game_State& state) const {
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
     SDL_RenderClear(renderer);
 
-    draw_board(renderer, state.board, WIDTH, VISIBLE_HEIGHT, MARGIN_X, MARGIN_Y);
+    draw_board(renderer, state.board, WIDTH, HEIGHT, MARGIN_X, MARGIN_Y);
     display_game_info(renderer, state, font, HIGHLIGHT_COLOR);
 
     switch (state.phase) {
@@ -210,7 +307,7 @@ void Performer::show(const Game_State& state) const {
         show_play_screen(renderer, state);
         break;
     case Game_Phase::GAME_PHASE_LINE:
-        show_line_screen(state);
+        show_line_screen(renderer, state, HIGHLIGHT_COLOR);
         break;
     case Game_Phase::GAME_PHASE_GAMEOVER:
         show_gameover_screen(state);

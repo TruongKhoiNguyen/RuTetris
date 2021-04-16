@@ -41,6 +41,8 @@ struct Game_State {
 
     Piece_State piece;
 
+    bool lines[HEIGHT];
+
     int level;
     int line_count;
     int points;

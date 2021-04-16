@@ -32,7 +32,7 @@ void App::run_game() {
     std::fill(state.board, state.board + WIDTH*HEIGHT, 0);
 
     //Test
-    state.phase = Game_Phase::GAME_PHASE_PLAY;
+    state.phase = Game_Phase::GAME_PHASE_LINE;
     state.start_level = 10;
 
     state.level = 4;
@@ -41,8 +41,11 @@ void App::run_game() {
 
     state.piece.tetromino_index = 3;
     state.piece.rotation = 2;
-    state.piece.offset_col = 22 - 3;
-    state.piece.offset_row = 0;
+    state.piece.offset_col = 0;
+    state.piece.offset_row = 2;
+
+    std::fill(state.lines, state.lines + HEIGHT, false);
+    state.lines[20] = true;
 
     for (int i = 0; i < HEIGHT; ++i) {
         for (int j = 0; j < WIDTH; ++j) {
