@@ -19,7 +19,7 @@
 	"Game_Constant.h"
 	"Tetromino.h"
 
-1618503819 d:\documents\codes\temp\tetris\include\performer.h
+1618575797 d:\documents\codes\temp\tetris\include\performer.h
 	<iostream>
 	<SDL.h>
 	<SDL_ttf.h>
@@ -27,11 +27,12 @@
 	"../Game_Constant.h"
 	"../Structures.h"
 	"../Color.h"
+	"Sound_Player.h"
 
-1618570585 source:d:\documents\codes\temp\tetris\src\app.cpp
+1618576600 source:d:\documents\codes\temp\tetris\src\app.cpp
 	"App.h"
 
-1618570630 source:d:\documents\codes\temp\tetris\src\performer.cpp
+1618576147 source:d:\documents\codes\temp\tetris\src\performer.cpp
 	"Performer.h"
 
 1618485233 d:\documents\codes\temp\tetris\color.h
@@ -39,5 +40,15 @@
 
 1618536775 d:\documents\codes\temp\tetris\tetromino.h
 
-1618539863 d:\documents\codes\temp\tetris\game_constant.h
+1618571748 d:\documents\codes\temp\tetris\game_constant.h
+
+1618576003 d:\documents\codes\temp\tetris\include\sound_player.h
+	<iostream>
+	<cstdint>
+	<SDL.h>
+	<SDL_mixer.h>
+	"../Game_Constant.h"
+
+1618576371 source:d:\documents\codes\temp\tetris\src\sound_player.cpp
+	"Sound_Player.h"
 

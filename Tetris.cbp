@@ -40,8 +40,10 @@
 		<Unit filename="Tetromino.h" />
 		<Unit filename="include/App.h" />
 		<Unit filename="include/Performer.h" />
+		<Unit filename="include/Sound_Player.h" />
 		<Unit filename="src/App.cpp" />
 		<Unit filename="src/Performer.cpp" />
+		<Unit filename="src/Sound_Player.cpp" />
 		<Extensions>
 			<lib_finder disable_auto="1" />
 		</Extensions>

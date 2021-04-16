@@ -2,6 +2,7 @@
 
 Performer::Performer()
 {
+    //Create window and renderer
     window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                               SCREEN_WIDTH, SCREEN_HEIGHT,
                               SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL);
@@ -11,22 +12,19 @@ Performer::Performer()
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-    if (Mix_OpenAudio(SOUND_FREQUENCY, MIX_DEFAULT_FORMAT, CHANNELS, CHUNKSIZE) != 1) printf("%s", Mix_GetError());
-
+    //Initiate libraries
     if (TTF_Init() != 1) printf("%s", TTF_GetError());
     font = TTF_OpenFont(FONT, 24);
     if (!font) printf("%s", TTF_GetError());
 }
 
 Performer::~Performer() {
-    Mix_CloseAudio();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
 }
 
 void Performer::play_background_music() {
-    Mix_Music* music = Mix_LoadMUS(BGMUSIC);
-    Mix_PlayMusic(music, -1);
+    player.play_BG();
 }
 
 void display_text(SDL_Renderer* renderer, TTF_Font* font, const char* text,
@@ -259,25 +257,43 @@ inline void draw_silhouette(SDL_Renderer* renderer, const Game_State& state) {
 /*
 Draw piece
 Draw piece silhouette
+Play fall sound
+    check last sound time
+    if last sound time > define time
+        Play sound
 */
-inline void show_play_screen(SDL_Renderer* renderer, const Game_State& state) {
+inline void show_play_screen(SDL_Renderer* renderer, const Game_State& state,
+                             Sound_Player& player) {
     draw_piece(renderer, state.piece);
     draw_silhouette(renderer, state);
+
+    if (!player.is_freeze_time(1000)) {
+        player.play_sound_effect(Sound_Effect::FALL, 0);
+    }
 }
 
 /*
 Check filled row
 Flash filled area
 Play sound
+    check last sound time
+    if last sound time > define time
+    Play sound
 */
-void show_line_screen(SDL_Renderer* renderer, const Game_State& state, const Color& highlight_color) {
+void show_line_screen(SDL_Renderer* renderer, const Game_State& state, const Color& highlight_color,
+                      Sound_Player& player) {
     for (int i = HEIGHT-1; i >= 0; --i) {
         if (state.lines[i]){
             int x = 0;
             int y = i * GRID_SIZE + MARGIN_Y;
             fill_rect(renderer, x, y, WIDTH * GRID_SIZE, GRID_SIZE, highlight_color);
+
+            if (!player.is_freeze_time(1000)) {
+                player.play_sound_effect(Sound_Effect::LINE, 0);
+            }
         }
     }
+
 }
 void show_gameover_screen(const Game_State& state) {}
 
@@ -290,7 +306,7 @@ Draw board
 Draw information
 Draw game
 */
-void Performer::show(const Game_State& state) const {
+void Performer::show(const Game_State& state) {
     const Color HIGHLIGHT_COLOR = Color(0xFF, 0xFF, 0xFF, 0xFF);
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
@@ -304,10 +320,10 @@ void Performer::show(const Game_State& state) const {
         show_start_screen(renderer, state, font, HIGHLIGHT_COLOR);
         break;
     case Game_Phase::GAME_PHASE_PLAY:
-        show_play_screen(renderer, state);
+        show_play_screen(renderer, state, player);
         break;
     case Game_Phase::GAME_PHASE_LINE:
-        show_line_screen(renderer, state, HIGHLIGHT_COLOR);
+        show_line_screen(renderer, state, HIGHLIGHT_COLOR, player);
         break;
     case Game_Phase::GAME_PHASE_GAMEOVER:
         show_gameover_screen(state);
