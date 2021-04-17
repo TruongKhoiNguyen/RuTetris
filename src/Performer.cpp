@@ -2,6 +2,8 @@
 
 Performer::Performer()
 {
+    if (!SDL_WasInit(SDL_INIT_EVERYTHING))
+        if (SDL_Init(SDL_INIT_EVERYTHING) != 1) printf("%s", SDL_GetError());
     //Create window and renderer
     window = SDL_CreateWindow(TITLE, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
                               SCREEN_WIDTH, SCREEN_HEIGHT,
@@ -9,6 +11,7 @@ Performer::Performer()
     if (!window) printf("%s\n", SDL_GetError());
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (!renderer) printf("%s\n", SDL_GetError());
+
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
     SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -102,10 +105,8 @@ void draw_cell(SDL_Renderer* renderer, int value, int pos_x, int pos_y, int offs
     int y = pos_y * GRID_SIZE + offset_y;
 
     fill_rect(renderer, x, y, GRID_SIZE, GRID_SIZE, dark_color);
-    fill_rect(renderer, x + edge, y,
-        GRID_SIZE - edge, GRID_SIZE - edge, light_color);
-    fill_rect(renderer, x + edge, y + edge,
-        GRID_SIZE - edge * 2, GRID_SIZE - edge * 2, base_color);
+    fill_rect(renderer, x + edge, y, GRID_SIZE - edge, GRID_SIZE - edge, light_color);
+    fill_rect(renderer, x + edge, y + edge, GRID_SIZE - edge * 2, GRID_SIZE - edge * 2, base_color);
 }
 
 /*
@@ -122,11 +123,9 @@ void draw_board(SDL_Renderer* renderer, const int board[], int width, int height
     fill_rect(renderer, offset_x, offset_y,
               width * GRID_SIZE, height * GRID_SIZE, BASE_COLORS[0]);
 
-    for (int i = 0; i < width; ++i) {
-        for (int j = 0; j < height; ++j) {
-            draw_cell(renderer, board[i*width + j], i, j, offset_x, offset_y);
-        }
-    }
+    for (int row = 0; row < height; ++row)
+        for (int col = 0; col < height; ++col)
+            draw_cell(renderer, board[row*width + col], col, row, offset_x, offset_y);
 
     fill_rect(renderer, 0, MARGIN_Y,
               WIDTH * GRID_SIZE, (HEIGHT - VISIBLE_HEIGHT) * GRID_SIZE,
@@ -142,18 +141,16 @@ Display start text on screen
 inline void show_start_screen(SDL_Renderer* renderer, const Game_State& state, TTF_Font* font, const Color& highlight_color,
                               Sound_Player& player) {
     char buffer[4096];
-
     int x = WIDTH * GRID_SIZE / 2;
     int y = (HEIGHT * GRID_SIZE + MARGIN_Y) / 2;
+
     display_text(renderer, font, "PRESS START",
                 x, y, Text_Align::TEXT_ALIGN_CENTER, highlight_color);
-
     snprintf(buffer, sizeof(buffer), "STARTING LEVEL: %d", state.start_level);
     display_text(renderer, font, buffer, x, y + 30, Text_Align::TEXT_ALIGN_CENTER, highlight_color);
 
-    if (state.selecting) {
+    if (state.selecting)
         player.play_sound_effect(Sound_Effect::SELECTION, 0);
-    }
 }
 
 void draw_rect(SDL_Renderer* renderer, int x, int y, int width, int height, const Color& color){
@@ -185,24 +182,24 @@ For each cell in piece, draw cell
 */
 void draw_piece(SDL_Renderer* renderer, const Piece_State& piece, bool outline = false) {
     const int side = TETROMINOES[piece.tetromino_index].side;
-    for (int row = 0; row < side; ++row) {
-        for (int col = 0; col < side; ++col) {
-            int color_index = piece.get_value(row, col);
-            if (color_index) {
-                if (!outline) {
+    for (int row = 0; row < side; ++row)
+        for (int col = 0; col < side; ++col)
+        {
+           int color_index = piece.get_value(row, col);
+           if (color_index)
+           {
+                if (!outline)
                     draw_cell(renderer, color_index,
                           piece.offset_col + col,
                           piece.offset_row + row,
                           MARGIN_X, MARGIN_Y);
-                } else {
+                else
                     draw_outline(renderer, color_index,
                                  piece.offset_col + col,
                                  piece.offset_row + row,
                                  MARGIN_X, MARGIN_Y);
-                }
-            }
+           }
         }
-    }
 }
 
 /*
@@ -215,32 +212,16 @@ For each piece check if it collide with wall or other piece
 */
 inline bool detect_collision(const int board[], const Piece_State& piece) {
     int side = TETROMINOES[piece.tetromino_index].side;
-    for (int row = 0; row < side; ++row) {
-        for (int col = 0; col < side; ++col) {
-            int value = piece.get_value(row, col);
-
-            if (value) {
+    for (int row = 0; row < side; ++row)
+        for (int col = 0; col < side; ++col)
+            if (piece.get_value(row, col)) {
                 int board_row = piece.offset_row + row;
                 int board_col = piece.offset_col + col;
-
-                if (board_row < 0){
-                    return true;
-                }
-                if (board_row >= HEIGHT){
-                    return true;
-                }
-                if (board_col < 0){
-                    return true;
-                }
-                if (board_col >= WIDTH){
-                    return true;
-                }
-                if (board[board_row * WIDTH + board_col]){
-                    return true;
-                }
+                bool condition = (board_row < 0) | (board_row >= HEIGHT) |
+                                 (board_col < 0) | (board_col >= WIDTH) |
+                                 board[board_row * WIDTH + board_col];
+                if (condition) return true;
             }
-        }
-    }
     return false;
 }
 
@@ -254,9 +235,8 @@ Draw piece
 inline void draw_silhouette(SDL_Renderer* renderer, const Game_State& state) {
     Piece_State piece = state.piece;
 
-    while (!detect_collision(state.board, piece)){
+    while (!detect_collision(state.board, piece))
         ++piece.offset_row;
-    }
     --piece.offset_row;
 
     draw_piece(renderer, piece, true);
@@ -275,9 +255,8 @@ inline void show_play_screen(SDL_Renderer* renderer, const Game_State& state,
     draw_piece(renderer, state.piece);
     draw_silhouette(renderer, state);
 
-    if (!player.is_freeze_time(1000)) {
+    if (!player.is_freeze_time(1000))
         player.play_sound_effect(Sound_Effect::FALL, 0);
-    }
 }
 
 /*
@@ -290,18 +269,15 @@ Play sound
 */
 void show_line_screen(SDL_Renderer* renderer, const Game_State& state, const Color& highlight_color,
                       Sound_Player& player) {
-    for (int i = HEIGHT-1; i >= 0; --i) {
+    for (int i = HEIGHT-1; i >= 0; --i)
         if (state.lines[i]){
             int x = 0;
             int y = i * GRID_SIZE + MARGIN_Y;
             fill_rect(renderer, x, y, WIDTH * GRID_SIZE, GRID_SIZE, highlight_color);
 
-            if (!player.is_freeze_time(1000)) {
+            if (!player.is_freeze_time(1000))
                 player.play_sound_effect(Sound_Effect::LINE, 0);
-            }
         }
-    }
-
 }
 void show_gameover_screen(const Game_State& state) {}
 

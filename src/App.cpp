@@ -68,23 +68,6 @@ void App::run_game() {
     std::fill(state.lines, state.lines + HEIGHT, false);
     state.lines[20] = true;
 
-    int side = TETROMINOES[state.piece.tetromino_index].side;
-    for (int i = 0; i < side; ++i) {
-        for (int j = 0; j < side; ++j) {
-            std::cout << TETROMINOES[state.piece.tetromino_index].shape[i*side + j] << " ";
-        }
-        std::cout << std::endl;
-    }
-
-    std::cout << std::endl;
-
-    for (int i = 0; i < side; ++i) {
-        for (int j = 0; j < side; ++j) {
-            std::cout << state.piece.get_value(i, j) << " ";
-        }
-        std::cout << std::endl;
-    }
-
     bool quit = false;
     while (!quit) {
         SDL_Event e;
@@ -92,8 +75,6 @@ void App::run_game() {
             switch (e.type) {
             case SDL_QUIT:
                 quit = true;
-                break;
-            default:
                 break;
             }
         }

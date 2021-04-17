@@ -1,10 +1,4 @@
 #include "Logic.h"
-
-//Get random number from 0 to the number of TETROMINOES
-inline int generate_piece() {
-    return rand() % TETROMINOES_SIZE;
-}
-
 /*
 Generate QUEUE_SIZE items for display
 */
@@ -13,7 +7,7 @@ Logic::Logic()
     srand(time(nullptr));
 
     for (int i = 0; i < QUEUE_SIZE; ++i) {
-        piece_queue.push(generate_piece());
+        piece_queue.push(rand() % TETROMINOES_SIZE);
     }
 }
 
@@ -46,40 +40,20 @@ inline void update_game_start(const Input_State& input, Game_State& state) {
     else state.selecting = false;
 }
 
-bool check_piece_valid(int board[], const Piece_State& piece)
-{
+bool check_piece_valid(int board[], const Piece_State& piece){
     int side = TETROMINOES[piece.tetromino_index].side;
 
-    for (int row = 0; row < side; ++row) {
-        for (int col = 0; col < side; ++col){
-            int value = piece.get_value(row, col);
-            if (value > 0)
+    for (int row = 0; row < side; ++row)
+        for (int col = 0; col < side; ++col)
+            if (piece.get_value(row, col))
             {
                 int board_row = piece.offset_row + row;
                 int board_col = piece.offset_col + col;
-                if (board_row < 0)
-                {
-                    return false;
-                }
-                if (board_row >= HEIGHT)
-                {
-                    return false;
-                }
-                if (board_col < 0)
-                {
-                    return false;
-                }
-                if (board_col >= WIDTH)
-                {
-                    return false;
-                }
-                if (board[row * WIDTH + col])
-                {
-                    return false;
-                }
+                bool condition = (board_row < 0) | (board_row >= HEIGHT) |
+                                 (board_col < 0) | (board_col >= WIDTH) |
+                                 board[row * WIDTH + col];
+                if (condition) return false;
             }
-        }
-    }
     return true;
 }
 
@@ -91,23 +65,14 @@ Check collision
 */
 inline void move_piece(const Input_State& input, Game_State& state){
     Piece_State piece = state.piece;
-    if (input.dleft > 0)
-    {
-        --piece.offset_col;
-    }
-    if (input.dright > 0)
-    {
-        ++piece.offset_col;
-    }
-    if (input.dup > 0)
-    {
-        piece.rotation = (piece.rotation + 1) % 4;
-    }
+    if (input.dleft >0) --piece.offset_col;
+    if (input.dright > 0) ++piece.offset_col;
+    if (input.dup > 0) piece.rotation = (piece.rotation + 1) % 4;
 
-    if (check_piece_valid(state.board, piece)) {
+    if (check_piece_valid(state.board, piece))
         state.piece = piece;
-    }
 }
+
 inline void hard_drop(Game_State& state, std::queue<int>& piece_queue){}
 void soft_drop(Game_State& state) {}
 inline void check_line(Game_State& state) {}
@@ -123,9 +88,7 @@ Check game over
 */
 inline void update_game_play(const Input_State& input, Game_State& state, std::queue<int>& piece_queue) {
     move_piece(input, state);
-    if (input.da > 0) {
-        hard_drop(state, piece_queue);
-    }
+    if (input.da > 0) hard_drop(state, piece_queue);
     soft_drop(state);
     check_line(state);
     check_game_over(state);
@@ -152,8 +115,6 @@ void Logic::update_game(const Input_State& input, Game_State& state, bool& quit)
         break;
     case Game_Phase::GAME_PHASE_GAMEOVER:
         update_game_gameover(input, state);
-        break;
-    default:
         break;
     }
 }
