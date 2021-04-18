@@ -115,7 +115,6 @@ Out: Draw board on screen
 
 Draw board background
 Draw piece on board
-Omit 2 first row
 */
 void draw_board(SDL_Renderer* renderer, const int board[], int width, int height,
                 int offset_x, int offset_y)
@@ -126,10 +125,6 @@ void draw_board(SDL_Renderer* renderer, const int board[], int width, int height
     for (int row = 0; row < height; ++row)
         for (int col = 0; col < height; ++col)
             draw_cell(renderer, board[row*width + col], col, row, offset_x, offset_y);
-
-    fill_rect(renderer, 0, MARGIN_Y,
-              WIDTH * GRID_SIZE, (HEIGHT - VISIBLE_HEIGHT) * GRID_SIZE,
-              Color(0x00, 0x00, 0x00, 0x00));
 }
 
 /*
@@ -279,7 +274,13 @@ void show_line_screen(SDL_Renderer* renderer, const Game_State& state, const Col
                 player.play_sound_effect(Sound_Effect::LINE, 0);
         }
 }
-void show_gameover_screen(const Game_State& state) {}
+
+void show_gameover_screen(SDL_Renderer* renderer, TTF_Font* font, const Color& highlight_color) {
+    int x = WIDTH * GRID_SIZE / 2;
+    int y = (HEIGHT * GRID_SIZE + MARGIN_Y) / 2;
+    display_text(renderer, font, "GAME OVER",
+                x, y, Text_Align::TEXT_ALIGN_CENTER, highlight_color);
+}
 
 /*
 In: Game_State
@@ -297,7 +298,6 @@ void Performer::show(const Game_State& state) {
     SDL_RenderClear(renderer);
 
     draw_board(renderer, state.board, WIDTH, HEIGHT, MARGIN_X, MARGIN_Y);
-    display_game_info(renderer, state, font, HIGHLIGHT_COLOR);
 
     switch (state.phase) {
     case Game_Phase::GAME_PHASE_START:
@@ -310,11 +310,15 @@ void Performer::show(const Game_State& state) {
         show_line_screen(renderer, state, HIGHLIGHT_COLOR, player);
         break;
     case Game_Phase::GAME_PHASE_GAMEOVER:
-        show_gameover_screen(state);
-        break;
-    default:
+        show_gameover_screen(renderer, font, HIGHLIGHT_COLOR);
         break;
     }
+
+    //Omit 2 first row
+    fill_rect(renderer, 0, MARGIN_Y,
+              WIDTH * GRID_SIZE, (HEIGHT - VISIBLE_HEIGHT) * GRID_SIZE,
+              Color(0x00, 0x00, 0x00, 0x00));
+    display_game_info(renderer, state, font, HIGHLIGHT_COLOR);
 
     SDL_RenderPresent(renderer);
 }

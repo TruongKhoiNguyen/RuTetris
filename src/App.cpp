@@ -53,7 +53,7 @@ void App::run_game() {
     std::fill(state.board, state.board + WIDTH*HEIGHT, 0);
 
     //Test
-    state.phase = Game_Phase::GAME_PHASE_START;
+    state.phase = Game_Phase::GAME_PHASE_PLAY;
     state.start_level = 10;
 
     state.level = 4;
@@ -81,7 +81,7 @@ void App::run_game() {
         u32 start_time = SDL_GetTicks();//Framerate cap
 
         scan_input(input);
-        logic.update_game(input, state, quit);
+        logic.update_game(input, state, quit, start_time);
         performer.show(state);
 
         u32 end_time = SDL_GetTicks();
